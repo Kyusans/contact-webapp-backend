@@ -124,7 +124,6 @@
              return $returnValue; 
         }
         
-
         //get
         function getUsername(){
             include "connection.php";
@@ -195,6 +194,57 @@
 
             return $returnValue;
         }
+
+        function deleteContact($json){
+            include "connection.php";
+
+            $json = json_decode($json, true);
+
+            $conId = $json["conId"];
+
+            $sql = "DELETE FROM tblcontact WHERE con_id = :conId";
+            $stmt = $conn->prepare($sql);
+
+            $stmt->bindParam(":conId", $conId);
+            $returnValue = 0;
+
+            if($stmt->execute()){
+                if($stmt->rowCount() > 0){
+                    $returnValue = 1;
+                }
+            }
+
+            return $returnValue;
+        }
+        
+        function selectContact($json){
+            include "connection.php";
+
+            $json = json_decode($json, true);
+
+            $contactId = $json["contactId"];
+
+            $sql = "SELECT * FROM tblcontact WHERE con_id=:contactId";
+
+            $stmt = $conn->prepare($sql);
+            $stmt->bindParam(":contactId", $contactId);
+
+            $returnValue = 0;
+
+            if($stmt->execute()){
+                if($stmt->rowCount() > 0){
+                    $rs = $stmt->fetch(PDO::FETCH_ASSOC);
+                    $returnValue = json_encode($rs);
+                }
+            }
+
+            return $returnValue;
+            
+        }
+
+        function updateContact($json){
+            
+        }
     }
 
     $json = isset($_POST["json"]) ? $_POST["json"] : "0";
@@ -223,6 +273,12 @@
             break;
         case "getGroup":
             echo $user->getGroup($json);
+            break;
+        case "deleteContact":
+            echo $user->deleteContact($json);
+            break;
+        case "selectContact":
+            echo $user->selectContact($json);
             break;
     }
 ?>
