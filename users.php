@@ -57,8 +57,6 @@
             return $returnValue;
         }
 
-
-        //add 
         function addContact($json){
             include "connection.php";
            // {"fullName":"qweqweqw", "mobileNumber":"23123123123", "officeNumber":"123123421", "address":"asdaswe", "email":"@gmaqweqweil", "groupId":"1", "userId":"1", "mobileNumber2":"123123213123123"}
@@ -123,77 +121,6 @@
  
              return $returnValue; 
         }
-        
-        //get
-        function getUsername(){
-            include "connection.php";
-
-            $sql = "SELECT user_username, user_email FROM tblusers";
-
-            $stmt = $conn->prepare($sql);
-            $returnValue = 0;
-
-            if($stmt->execute()){
-                if($stmt->rowCount()){
-                    $rs = $stmt->fetchAll(PDO::FETCH_ASSOC);
-                    $returnValue = json_encode($rs);
-                }
-            }
-
-            return $returnValue;
-        }
-
-        function getContact($json){
-            include "connection.php";
-
-            // {"userId":"1"}
-
-            $json = json_decode($json, true);
-
-            $userId = $json["userId"];
-
-            $sql = "SELECT * FROM tblcontact WHERE con_userId=:userId";
-            
-            $stmt = $conn->prepare($sql);
-            $stmt->bindParam(":userId", $userId);
-
-            $returnValue = 0;
-
-            if($stmt->execute()){
-                if($stmt->rowCount() > 0){
-                    $rs = $stmt->fetchAll(PDO::FETCH_ASSOC);
-                    $returnValue = json_encode($rs);
-                }
-            }
-
-            return $returnValue;
-        }
-
-        function getGroup($json){
-            include "connection.php";
-
-            // {"userId":"1"}
-
-            $json = json_decode($json, true);
-
-            $userId = $json["userId"];
-
-            $sql = "SELECT * FROM tblgroup WHERE grp_userId=:userId";
-            
-            $stmt = $conn->prepare($sql);
-            $stmt->bindParam(":userId", $userId);
-
-            $returnValue = 0;
-
-            if($stmt->execute()){
-                if($stmt->rowCount() > 0){
-                    $rs = $stmt->fetchAll(PDO::FETCH_ASSOC);
-                    $returnValue = json_encode($rs);
-                }
-            }
-
-            return $returnValue;
-        }
 
         function deleteContact($json){
             include "connection.php";
@@ -243,6 +170,120 @@
         }
 
         function updateContact($json){
+            include "connection.php";
+            // {"fullName":"3", "mobileNumber":"2", "officeNumber":"2", "address":"2", "email":"@gmaqweqweil", "groupId":"1", "userId":"1", "secondMobileNumber":"33333123123","contactId":"3"}
+
+            $json = json_decode($json, true);
+
+            $contactId = $json["contactId"];
+            $fullName = $json["fullName"];
+            $mobileNumber = $json["mobileNumber"];
+            $officeNumber = $json["officeNumber"];
+            $address = $json["address"];
+            $email = $json["email"];
+            $groupId = $json["groupId"];
+            $secondMobileNumber = $json["secondMobileNumber"];
+            
+            $sql = "UPDATE tblcontact SET con_fullName = :fullName, con_mobileNumber = :mobileNumber, con_officeNumber = :officeNumber, con_address = :address, con_email = :email, ";
+            $sql .= "con_groupId = :groupId, con_mobileNumber2 = :secondMobileNumber ";
+            $sql .= "WHERE con_id = :contactId";
+            
+            $stmt = $conn->prepare($sql);
+
+            $stmt->bindParam(":fullName", $fullName);
+            $stmt->bindParam(":mobileNumber", $mobileNumber);
+            $stmt->bindParam(":officeNumber", $officeNumber);
+            $stmt->bindParam(":address", $address);
+            $stmt->bindParam(":email", $email);
+            $stmt->bindParam(":groupId", $groupId);
+            $stmt->bindParam(":secondMobileNumber", $secondMobileNumber);
+            $stmt->bindParam(":contactId", $contactId);
+            $returnValue = 0;
+
+            if($stmt->execute()){
+                if($stmt->rowCount() > 0){
+                    $returnValue = 1;
+                }
+            }
+
+            return $returnValue;    
+        }
+
+        //get
+        function getUsername(){
+            include "connection.php";
+
+            $sql = "SELECT user_username, user_email FROM tblusers";
+
+            $stmt = $conn->prepare($sql);
+            $returnValue = 0;
+
+            if($stmt->execute()){
+                if($stmt->rowCount()){
+                    $rs = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                    $returnValue = json_encode($rs);
+                }
+            }
+
+            return $returnValue;
+        }
+        function getContact($json){
+            include "connection.php";
+
+            // {"userId":"1"}
+
+            $json = json_decode($json, true);
+
+            $userId = $json["userId"];
+
+            $sql = "SELECT * FROM tblcontact WHERE con_userId=:userId";
+            
+            $stmt = $conn->prepare($sql);
+            $stmt->bindParam(":userId", $userId);
+
+            $returnValue = 0;
+
+            if($stmt->execute()){
+                if($stmt->rowCount() > 0){
+                    $rs = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                    $returnValue = json_encode($rs);
+                }
+            }
+
+            return $returnValue;
+        }
+        function getGroup($json){
+            include "connection.php";
+
+            // {"userId":"1"}
+
+            $json = json_decode($json, true);
+
+            $userId = $json["userId"];
+
+            $sql = "SELECT * FROM tblgroup WHERE grp_userId=:userId";
+            
+            $stmt = $conn->prepare($sql);
+            $stmt->bindParam(":userId", $userId);
+
+            $returnValue = 0;
+
+            if($stmt->execute()){
+                if($stmt->rowCount() > 0){
+                    $rs = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                    $returnValue = json_encode($rs);
+                }
+            }
+
+            return $returnValue;
+        }
+
+        function getGroupName($json){
+            include("connection.php");
+
+            $json = json_decode($json,true);
+            
+            $groupId = $json["groupId"];
             
         }
     }
@@ -279,6 +320,9 @@
             break;
         case "selectContact":
             echo $user->selectContact($json);
+            break;
+        case "updateContact":
+            echo $user->updateContact($json);
             break;
     }
 ?>
